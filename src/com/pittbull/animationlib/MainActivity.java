@@ -25,4 +25,10 @@ public class MainActivity extends Activity
         setFixedOrientation();
         setContentView(R.layout.activity_main);
     }
+	
+	@Override
+	protected void onPause()
+	{
+		MyApp.get().kill();
+	}
 }

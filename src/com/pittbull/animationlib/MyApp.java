@@ -12,6 +12,11 @@ public class MyApp extends Application
 		app = this;
 	}
 	
+	public void kill()
+	{
+    	android.os.Process.killProcess (android.os.Process.myPid());
+	}
+	
 	public static MyApp get()
 	{
 		return app;
