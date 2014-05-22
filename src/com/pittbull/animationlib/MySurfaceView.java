@@ -56,7 +56,7 @@ public class MySurfaceView extends SurfaceView implements android.view.SurfaceHo
         float scale = 0.5f;
         
         background = new Background (R.raw.hubble);
-        background.setSpeed(2);
+        background.setSpeed(2,2);
         
         a = new Animation (R.raw.sprite25fps_0002, scale, 25);
         a.setPosition(100, 100);
@@ -147,7 +147,6 @@ public class MySurfaceView extends SurfaceView implements android.view.SurfaceHo
 			Canvas surface = getHolder().lockCanvas();
 			synchronized (surface)
 			{
-				//surface.drawColor(Color.BLACK);
 				background.drawAndUpdate (surface);
 				for (AnimObject item : animations)
 				{

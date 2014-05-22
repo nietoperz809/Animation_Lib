@@ -10,40 +10,37 @@ import android.graphics.Rect;
 public class Background implements AnimObject 
 {
 	private ScrollDirection direction;
-	private Bitmap bitmap;
-	private int speed = 1;
+	private Bitmap sourceBitmap;
+	private Bitmap copyBitmap1;
+	private Bitmap copyBitmap2;
+	private int speedx = 1;
+	private int speedy = 1;
+	private boolean dirx;
+	private boolean diry;
 	private Point screenSize = MySurfaceView.getScreenSize();
 	private Rect sourceRect1 = new Rect();
 	private Rect screenRect1 = new Rect();
 	private Rect sourceRect2 = new Rect();
 	private Rect screenRect2 = new Rect();
+	private Rect sourceRect3 = new Rect();
+	private Rect screenRect3 = new Rect();
+	private Rect sourceRect4 = new Rect();
+	private Rect screenRect4 = new Rect();
 
 	public Background (Context ctx, int resid)
 	{
-		bitmap = BitmapFactory.decodeResource (ctx.getResources(), resid);
-		bitmap = Bitmap.createScaledBitmap (bitmap, screenSize.x, screenSize.y, false);
-		setShiftMode(ScrollDirection.DOWN);
+		sourceBitmap = BitmapFactory.decodeResource (ctx.getResources(), resid);
+		sourceBitmap = Bitmap.createScaledBitmap (sourceBitmap, screenSize.x, screenSize.y, false);
+		copyBitmap1 = Bitmap.createBitmap (sourceBitmap);
+		copyBitmap2 = Bitmap.createBitmap (sourceBitmap);
+		setSpeed (1,1);
 	}
 	
 	public Background (int resid)
 	{
 		this (MyApp.get(), resid);
 	}
-		
-	public void setShiftMode (ScrollDirection dir)
-	{
-		direction = dir;
-		switch (dir)
-		{
-			case LEFT:
-			resetRectsForLeftScroll();	
-			break;
-			
-			case RIGHT:
-			resetRectsForRightScroll();	
-			break;
-		}
-	}
+	
 
 	private void resetRectsForRightScroll()
 	{
@@ -93,69 +90,93 @@ public class Background implements AnimObject
 
 	private void resetRectsForUpScroll()
 	{
-		sourceRect1.left = 0;
-		sourceRect1.top = 0;
-		sourceRect1.right = screenSize.x;
-		sourceRect1.bottom = screenSize.y;
+		sourceRect3.left = 0;
+		sourceRect3.top = 0;
+		sourceRect3.right = screenSize.x;
+		sourceRect3.bottom = screenSize.y;
 		
-		screenRect1.left = 0;
-		screenRect1.top = 0;
-		screenRect1.right = screenSize.x;
-		screenRect1.bottom = screenSize.y;
+		screenRect3.left = 0;
+		screenRect3.top = 0;
+		screenRect3.right = screenSize.x;
+		screenRect3.bottom = screenSize.y;
 
-		sourceRect2.left = 0;
-		sourceRect2.top = 0;
-		sourceRect2.right = screenSize.x;
-		sourceRect2.bottom = 0;
+		sourceRect4.left = 0;
+		sourceRect4.top = 0;
+		sourceRect4.right = screenSize.x;
+		sourceRect4.bottom = 0;
 
-		screenRect2.left = 0;
-		screenRect2.top = screenSize.y;
-		screenRect2.right = screenSize.x;
-		screenRect2.bottom = screenSize.y;
+		screenRect4.left = 0;
+		screenRect4.top = screenSize.y;
+		screenRect4.right = screenSize.x;
+		screenRect4.bottom = screenSize.y;
 	}
 	
 	private void resetRectsForDownScroll()
 	{
-		sourceRect1.left = 0;
-		sourceRect1.top = 0;
-		sourceRect1.right = screenSize.x;
-		sourceRect1.bottom = screenSize.y;
+		sourceRect3.left = 0;
+		sourceRect3.top = 0;
+		sourceRect3.right = screenSize.x;
+		sourceRect3.bottom = screenSize.y;
 		
-		screenRect1.left = 0;
-		screenRect1.top = 0;
-		screenRect1.right = screenSize.x;
-		screenRect1.bottom = screenSize.y;
+		screenRect3.left = 0;
+		screenRect3.top = 0;
+		screenRect3.right = screenSize.x;
+		screenRect3.bottom = screenSize.y;
 
-		sourceRect2.left = 0;
-		sourceRect2.top = screenSize.y;
-		sourceRect2.right = screenSize.x;
-		sourceRect2.bottom = screenSize.y;
+		sourceRect4.left = 0;
+		sourceRect4.top = screenSize.y;
+		sourceRect4.right = screenSize.x;
+		sourceRect4.bottom = screenSize.y;
 
-		screenRect2.left = 0;
-		screenRect2.top = 0;
-		screenRect2.right = screenSize.x;
-		screenRect2.bottom = 0;
+		screenRect4.left = 0;
+		screenRect4.top = 0;
+		screenRect4.right = screenSize.x;
+		screenRect4.bottom = 0;
 	}
 	
-	public void setSpeed (int s)
+	public void setSpeed (int x, int y)
 	{
-		speed = s;
+		speedx = Math.abs(x);
+		speedy = Math.abs(y);
+		dirx = x < 0;
+		diry = y < 0;
+		
+		resetRectsForRightScroll();
+		resetRectsForUpScroll();
+	}
+
+	@Override
+	public void drawAndUpdate(Canvas c) 
+	{
+		Canvas b1 = new Canvas (copyBitmap1);
+		Canvas b2 = new Canvas (copyBitmap2);
+
+		moveRight();
+		b1.drawBitmap(sourceBitmap, sourceRect1, screenRect1, null);
+		b1.drawBitmap(sourceBitmap, sourceRect2, screenRect2, null);
+
+		moveUp();
+		b2.drawBitmap (copyBitmap1, sourceRect3, screenRect3, null);
+		b2.drawBitmap (copyBitmap1, sourceRect4, screenRect4, null);
+		
+		draw (c);
 	}
 	
 	@Override
 	public void draw(Canvas c) 
 	{
-		c.drawBitmap(bitmap, sourceRect1, screenRect1, null);
-		c.drawBitmap(bitmap, sourceRect2, screenRect2, null);
+		//c.drawBitmap(sourceBitmap, sourceRect1, screenRect1, null);
+		//c.drawBitmap(sourceBitmap, sourceRect2, screenRect2, null);
+		c.drawBitmap(copyBitmap2, 0, 0, null);
 	}
 
 	private void moveDown()
 	{
-		sourceRect1.bottom -= speed;
-		screenRect1.top += speed;
-		screenRect2.bottom += speed;
-		sourceRect2.top -= speed;
-		if (sourceRect1.bottom < 0)
+		sourceRect3.bottom -= speedy;
+		screenRect3.top += speedy;
+		screenRect4.bottom += speedy;
+		sourceRect4.top -= speedy;
+		if (sourceRect3.bottom < 0)
 		{
 			resetRectsForDownScroll();
 		}
@@ -163,11 +184,11 @@ public class Background implements AnimObject
 	
 	private void moveUp()
 	{
-		sourceRect1.top += speed;
-		screenRect1.bottom -= speed;
-		screenRect2.top -= speed;
-		sourceRect2.bottom += speed;
-		if (screenRect1.bottom < 0)
+		sourceRect3.top += speedy;
+		screenRect3.bottom -= speedy;
+		screenRect4.top -= speedy;
+		sourceRect4.bottom += speedy;
+		if (screenRect3.bottom < 0)
 		{
 			resetRectsForUpScroll();
 		}
@@ -175,10 +196,10 @@ public class Background implements AnimObject
 	
 	private void moveLeft()
 	{
-		sourceRect1.left += speed;
-		screenRect1.right -= speed;
-		screenRect2.left -= speed;
-		sourceRect2.right += speed;
+		sourceRect1.left += speedx;
+		screenRect1.right -= speedx;
+		screenRect2.left -= speedx;
+		sourceRect2.right += speedx;
 		if (screenRect1.right < 0)
 		{
 			resetRectsForLeftScroll();
@@ -187,41 +208,13 @@ public class Background implements AnimObject
 	
 	private void moveRight()
 	{
-		sourceRect1.right -= speed;
-		screenRect1.left += speed;
-		screenRect2.right += speed;
-		sourceRect2.left -= speed;
+		sourceRect1.right -= speedx;
+		screenRect1.left += speedx;
+		screenRect2.right += speedx;
+		sourceRect2.left -= speedx;
 		if (sourceRect1.right < 0)
 		{
 			resetRectsForRightScroll();
-		}
-	}
-	
-	@Override
-	public void drawAndUpdate(Canvas c) 
-	{
-		draw (c);
-
-		switch (direction)
-		{
-			case DOWN:
-			moveDown();
-			break;
-		
-			case UP:
-			moveUp();
-			break;
-		
-			case LEFT:
-			moveLeft();
-			break;
-		
-			case RIGHT:
-			moveRight();
-			break;
-			
-			default:
-			break;
 		}
 	}
 }
