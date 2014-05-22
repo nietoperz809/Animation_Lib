@@ -2,6 +2,7 @@ package com.pittbull.animationlib;
 
 import java.util.ArrayList;
 
+import chargen.C64Chargen;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -23,6 +24,8 @@ public class MySurfaceView extends SurfaceView implements android.view.SurfaceHo
 	private Thread thread;
 	private Mover mover;
 	private Background background;
+	private OrientationSensor sens1 = new OrientationSensor();
+	private C64Chargen chargen = new C64Chargen();
 	
 	public MySurfaceView(Context context, AttributeSet attributeSet) 
 	{
@@ -56,7 +59,10 @@ public class MySurfaceView extends SurfaceView implements android.view.SurfaceHo
         float scale = 0.5f;
         
         background = new Background (R.raw.hubble);
-        background.setSpeed(2,2);
+        background.setSpeedVector(1, -5);
+        
+        chargen.setOrigin(10, 10);
+        chargen.printLine ("Hello World");
         
         a = new Animation (R.raw.sprite25fps_0002, scale, 25);
         a.setPosition(100, 100);
@@ -144,10 +150,15 @@ public class MySurfaceView extends SurfaceView implements android.view.SurfaceHo
 	{
 		while (running)
 		{
+			float pos[] = sens1.getValues();
+			if (pos != null)
+				background.setSpeedVector((int)pos[2]*10, (int)pos[1]*10);
+			
 			Canvas surface = getHolder().lockCanvas();
 			synchronized (surface)
 			{
 				background.drawAndUpdate (surface);
+				chargen.draw (surface);
 				for (AnimObject item : animations)
 				{
 					item.drawAndUpdate(surface);

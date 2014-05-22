@@ -1,5 +1,6 @@
 package com.pittbull.animationlib;
 
+import chargen.C64Chargen;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -7,42 +8,92 @@ import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.Rect;
 
+/**
+ * Class that animates a background image
+ * @author pbull809@gmail.com
+ *
+ */
 public class Background implements AnimObject 
 {
-	private ScrollDirection direction;
+	/**
+	 * Source bitmap, already scaled to screen size
+	 */
 	private Bitmap sourceBitmap;
-	private Bitmap copyBitmap1;
-	private Bitmap copyBitmap2;
-	private int speedx = 1;
-	private int speedy = 1;
+	/**
+	 * Offscreen bitmap for horizontal movement
+	 */
+	private Bitmap offScreenBitmap1;
+	/**
+	 * Offscreen bitmap for vertical movement
+	 */
+	private Bitmap offScreenBitmap2;
+	/**
+	 * Canvas for offscreen bitmap1
+	 */
+	Canvas offScreenCanvas1;
+	/**
+	 * Canvas for offscreen bitmap2
+	 */
+	Canvas offScreenCanvas2;
+	/**
+	 * Speed vector
+	 */
+	private Point speed = new Point (1,1);
+	/**
+	 * Sign of speed vector's X
+	 */
 	private boolean dirx;
+	/**
+	 * Sign of speed vector's Y
+	 */
 	private boolean diry;
+	/**
+	 * Screeen dimensions
+	 */
 	private Point screenSize = MySurfaceView.getScreenSize();
-	private Rect sourceRect1 = new Rect();
-	private Rect screenRect1 = new Rect();
-	private Rect sourceRect2 = new Rect();
-	private Rect screenRect2 = new Rect();
-	private Rect sourceRect3 = new Rect();
-	private Rect screenRect3 = new Rect();
-	private Rect sourceRect4 = new Rect();
-	private Rect screenRect4 = new Rect();
+	/**
+	 * Rect objects for bitmap copies
+	 */
+	private Rect sourceRect1 = new Rect(),
+			screenRect1 = new Rect(),
+			sourceRect2 = new Rect(),
+			screenRect2 = new Rect(),
+			sourceRect3 = new Rect(),
+			screenRect3 = new Rect(),
+			sourceRect4 = new Rect(),
+			screenRect4 = new Rect();
 
+	/**
+	 * Constructor
+	 * @param ctx Context to use
+	 * @param resid Ressource ID of bitmap
+	 */
 	public Background (Context ctx, int resid)
 	{
 		sourceBitmap = BitmapFactory.decodeResource (ctx.getResources(), resid);
 		sourceBitmap = Bitmap.createScaledBitmap (sourceBitmap, screenSize.x, screenSize.y, false);
-		copyBitmap1 = Bitmap.createBitmap (sourceBitmap);
-		copyBitmap2 = Bitmap.createBitmap (sourceBitmap);
-		setSpeed (1,1);
+		offScreenBitmap1 = Bitmap.createBitmap (sourceBitmap);
+		offScreenBitmap2 = Bitmap.createBitmap (sourceBitmap);
+		offScreenCanvas1 = new Canvas (offScreenBitmap1);
+		offScreenCanvas2 = new Canvas (offScreenBitmap2);
+		setSpeedVector (1,1);
 	}
+	
+	/**
+	 * Constructor that needs only a ressource ID
+	 * @param resid Ressource ID of bitmap
+	 */
 	
 	public Background (int resid)
 	{
 		this (MyApp.get(), resid);
 	}
 	
+	/**
+	 * Prepares Rect Objects
+	 */
 
-	private void resetRectsForRightScroll()
+	private void prepareRectsForRightScroll()
 	{
 		sourceRect1.left = 0;
 		sourceRect1.top = 0;
@@ -65,7 +116,11 @@ public class Background implements AnimObject
 		screenRect2.bottom = screenSize.y;
 	}
 	
-	private void resetRectsForLeftScroll()
+	
+	/**
+	 * Prepares Rect Objects
+	 */
+	private void prepareRectsForLeftScroll()
 	{
 		sourceRect1.left = 0;
 		sourceRect1.top = 0;
@@ -88,7 +143,12 @@ public class Background implements AnimObject
 		screenRect2.bottom = screenSize.y;
 	}
 
-	private void resetRectsForUpScroll()
+
+
+	/**
+	 * Prepares Rect Objects
+	 */
+	private void prepareRectsForUpScroll()
 	{
 		sourceRect3.left = 0;
 		sourceRect3.top = 0;
@@ -111,7 +171,12 @@ public class Background implements AnimObject
 		screenRect4.bottom = screenSize.y;
 	}
 	
-	private void resetRectsForDownScroll()
+
+
+	/**
+	 * Prepares Rect Objects
+	 */
+	private void prepareRectsForDownScroll()
 	{
 		sourceRect3.left = 0;
 		sourceRect3.top = 0;
@@ -134,87 +199,120 @@ public class Background implements AnimObject
 		screenRect4.bottom = 0;
 	}
 	
-	public void setSpeed (int x, int y)
-	{
-		speedx = Math.abs(x);
-		speedy = Math.abs(y);
-		dirx = x < 0;
-		diry = y < 0;
-		
-		resetRectsForRightScroll();
-		resetRectsForUpScroll();
-	}
 
+	/**
+	 * Sets a (new speed vector)
+	 * @param x X-Component
+	 * @param y Y-Component
+	 */
+	public void setSpeedVector (int x, int y)
+	{
+		speed.x = Math.abs(x);
+		speed.y = Math.abs(y);
+		dirx = x > 0;
+		diry = y > 0;
+		
+		if (dirx)
+			prepareRectsForRightScroll();
+		else
+			prepareRectsForLeftScroll();
+		if (diry)
+			prepareRectsForUpScroll();
+		else
+			prepareRectsForDownScroll();
+	}
+	
+
+	/**
+	 * Moves background one step and displays it
+	 */
 	@Override
 	public void drawAndUpdate(Canvas c) 
 	{
-		Canvas b1 = new Canvas (copyBitmap1);
-		Canvas b2 = new Canvas (copyBitmap2);
+		if (dirx)
+			moveRight();
+		else
+			moveLeft();
+		offScreenCanvas1.drawBitmap(sourceBitmap, sourceRect1, screenRect1, null);
+		offScreenCanvas1.drawBitmap(sourceBitmap, sourceRect2, screenRect2, null);
 
-		moveRight();
-		b1.drawBitmap(sourceBitmap, sourceRect1, screenRect1, null);
-		b1.drawBitmap(sourceBitmap, sourceRect2, screenRect2, null);
-
-		moveUp();
-		b2.drawBitmap (copyBitmap1, sourceRect3, screenRect3, null);
-		b2.drawBitmap (copyBitmap1, sourceRect4, screenRect4, null);
+		if (diry)
+			moveUp();
+		else
+			moveDown();
+		offScreenCanvas2.drawBitmap (offScreenBitmap1, sourceRect3, screenRect3, null);
+		offScreenCanvas2.drawBitmap (offScreenBitmap1, sourceRect4, screenRect4, null);
 		
 		draw (c);
 	}
 	
+	
+	/**
+	 * Displays the background
+	 */
 	@Override
 	public void draw(Canvas c) 
 	{
-		//c.drawBitmap(sourceBitmap, sourceRect1, screenRect1, null);
-		//c.drawBitmap(sourceBitmap, sourceRect2, screenRect2, null);
-		c.drawBitmap(copyBitmap2, 0, 0, null);
+		c.drawBitmap(offScreenBitmap2, 0, 0, null);
 	}
 
+	/**
+	 * Moves background image
+	 */
 	private void moveDown()
 	{
-		sourceRect3.bottom -= speedy;
-		screenRect3.top += speedy;
-		screenRect4.bottom += speedy;
-		sourceRect4.top -= speedy;
+		sourceRect3.bottom -= speed.y;
+		screenRect3.top += speed.y;
+		screenRect4.bottom += speed.y;
+		sourceRect4.top -= speed.y;
 		if (sourceRect3.bottom < 0)
 		{
-			resetRectsForDownScroll();
+			prepareRectsForDownScroll();
 		}
 	}
 	
+	/**
+	 * Moves background image
+	 */
 	private void moveUp()
 	{
-		sourceRect3.top += speedy;
-		screenRect3.bottom -= speedy;
-		screenRect4.top -= speedy;
-		sourceRect4.bottom += speedy;
+		sourceRect3.top += speed.y;
+		screenRect3.bottom -= speed.y;
+		screenRect4.top -= speed.y;
+		sourceRect4.bottom += speed.y;
 		if (screenRect3.bottom < 0)
 		{
-			resetRectsForUpScroll();
+			prepareRectsForUpScroll();
 		}
 	}
 	
+	/**
+	 * Moves background image
+	 */
 	private void moveLeft()
 	{
-		sourceRect1.left += speedx;
-		screenRect1.right -= speedx;
-		screenRect2.left -= speedx;
-		sourceRect2.right += speedx;
+		sourceRect1.left += speed.x;
+		screenRect1.right -= speed.x;
+		screenRect2.left -= speed.x;
+		sourceRect2.right += speed.x;
 		if (screenRect1.right < 0)
 		{
-			resetRectsForLeftScroll();
+			prepareRectsForLeftScroll();
 		}
 	}
 	
+	/**
+	 * Moves background image
+	 */
 	private void moveRight()
 	{
-		sourceRect1.right -= speedx;
-		screenRect1.left += speedx;
-		screenRect2.right += speedx;
-		sourceRect2.left -= speedx;
+		sourceRect1.right -= speed.x;
+		screenRect1.left += speed.x;
+		screenRect2.right += speed.x;
+		sourceRect2.left -= speed.x;
 		if (sourceRect1.right < 0)
 		{
-			resetRectsForRightScroll();
+			prepareRectsForRightScroll();
 		}
 	}
 }
