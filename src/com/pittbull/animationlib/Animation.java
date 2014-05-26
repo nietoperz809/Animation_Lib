@@ -11,71 +11,139 @@ import android.graphics.Rect;
 
 public class Animation implements AnimObject
 {
+	/**
+	 * Pieces
+	 */
 	private Bitmap[] bitmaps;
+	/**
+	 * Width/Height of one Piece
+	 */
 	private Point piecedim = new Point();
+	/**
+	 * Current index in bitmap array
+	 */
 	private int bitmapIndex;
+	/**
+	 * Animation delay
+	 */
 	private int delay = -1, delay_save;
+	/**
+	 * 
+	 */
 	private boolean pointer_direction;
 	private Point position = new Point (0, 0);
 	private AnimationDirection animation_direction = AnimationDirection.FORWARD;
 	private Point moveVector = new Point(0, 0);
 	
+	/**
+	 * Copy Constructor
+	 * @param a Another Animation object
+	 */
 	public Animation (Animation a)
 	{
 		bitmaps = a.bitmaps;
 		piecedim = new Point (a.piecedim);
 	}
 	
+	/**
+	 * Constructor
+	 * @param source Bitmap that contains all pieces
+	 * @param scale Scaling factor. Can be < 1
+	 * @param pieces Number of pieces in source bitmap
+	 */
 	public Animation (Bitmap source, float scale, int pieces)
 	{
 		buildTiles (source, scale, pieces);
 	}
 
+	/**
+	 * Constructor
+	 * @param resid Resource ID of bitmap
+	 * @param scale Scaling factor. Can be < 1
+	 * @param pieces Number of pieces in source bitmap
+	 */
 	public Animation (int resid, float scale, int pieces)
 	{
 		this (MyApp.get(), resid, scale, pieces);
 	}
 	
+	/**
+	 * Constructor
+	 * @param ctx Context to be used
+	 * @param resid Resource ID of bitmap
+	 * @param scale Scaling factor. Can be < 1
+	 * @param pieces Number of pieces in source bitmap
+	 */
 	public Animation (Context ctx, int resid, float scale, int pieces)
 	{
 		Bitmap source = BitmapFactory.decodeResource(ctx.getResources(), resid);
 		buildTiles (source, scale, pieces);
 	}
 	
+	/**
+	 * Set current animation image
+	 * @param p the image index
+	 */
 	public void setCurrentPointer (int p)
 	{
 		bitmapIndex = p % bitmaps.length;
 	}
 	
+	/**
+	 * Set animation delay
+	 * @param d Ticks to sleep
+	 */
 	public void setDelay (int d)
 	{
 		delay = d;
 		delay_save = d;
 	}
 	
+	/**
+	 * Sets new animation direction and resets current animation
+	 * @param d New direction
+	 */
 	public void setDirection (AnimationDirection d)
 	{
 		animation_direction = d;
 		bitmapIndex = 0;
 	}
 	
+	/**
+	 * Set screen position
+	 * @param x XPos (Horizontal)
+	 * @param y YPos (Vertical)
+	 */
 	public void setPosition (int x, int y)
 	{
 		position.x = x;
 		position.y = y;
 	}
 	
+	/**
+	 * Set speed and velocity as vector
+	 * @param x Vector x-component
+	 * @param y Vector y-component
+	 */
 	public void setMoveVector (int x, int y)
 	{
 		moveVector.x = x;
 		moveVector.y = y;
 	}
 
+	/**
+	 * Get move vector
+	 * @return the vector
+	 */
 	public Point getMoveVector ()
 	{
 		return moveVector;
 	}
 	
+	/**
+	 * Moves Animation on step (by move vector)
+	 * @return The new position
+	 */
 	public Point doMove()
 	{
 		position.x += moveVector.x;
@@ -83,6 +151,10 @@ public class Animation implements AnimObject
         return position;
 	}
 	
+	/**
+	 * Rotates all bitmaps of the animation
+	 * @param angle Angle used for rotation
+	 */
 	public void setRotation (float angle)
 	{
 		for (int s=0; s<bitmaps.length; s++)
@@ -91,6 +163,10 @@ public class Animation implements AnimObject
 		}
 	}
 	
+	/**
+	 * Get the size of a single animation bitmao
+	 * @return
+	 */
 	public Point getDimension()
 	{
 		return piecedim;
@@ -145,7 +221,7 @@ public class Animation implements AnimObject
 		for (int s=0; s<pieces; s++)
 		{
 			bitmaps[s] = Bitmap.createBitmap (source, 
-					Math.round(s*pdx), 0, Math.round(pdx), piecedim.y);
+					(int)(s*pdx), 0, (int)(pdx), piecedim.y);
 		}
 	}
 

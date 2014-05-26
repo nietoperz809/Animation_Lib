@@ -1,6 +1,5 @@
 package com.pittbull.animationlib;
 
-import chargen.C64Chargen;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,15 +25,16 @@ public class Background implements AnimObject
 	/**
 	 * Offscreen bitmap for vertical movement
 	 */
-	private Bitmap offScreenBitmap2;
+	Bitmap off1; 
+	//private Bitmap offScreenBitmap2;
 	/**
 	 * Canvas for offscreen bitmap1
 	 */
-	Canvas offScreenCanvas1;
+	//Canvas offScreenCanvas1;
 	/**
 	 * Canvas for offscreen bitmap2
 	 */
-	Canvas offScreenCanvas2;
+	//Canvas offScreenCanvas2;
 	/**
 	 * Speed vector
 	 */
@@ -72,10 +72,7 @@ public class Background implements AnimObject
 	{
 		sourceBitmap = BitmapFactory.decodeResource (ctx.getResources(), resid);
 		sourceBitmap = Bitmap.createScaledBitmap (sourceBitmap, screenSize.x, screenSize.y, false);
-		offScreenBitmap1 = Bitmap.createBitmap (sourceBitmap);
-		offScreenBitmap2 = Bitmap.createBitmap (sourceBitmap);
-		offScreenCanvas1 = new Canvas (offScreenBitmap1);
-		offScreenCanvas2 = new Canvas (offScreenBitmap2);
+		off1 = Bitmap.createBitmap (sourceBitmap.getWidth(), sourceBitmap.getHeight(), Bitmap.Config.ARGB_8888);
 		setSpeedVector (1,1);
 	}
 	
@@ -229,21 +226,7 @@ public class Background implements AnimObject
 	@Override
 	public void drawAndUpdate(Canvas c) 
 	{
-		if (dirx)
-			moveRight();
-		else
-			moveLeft();
-		offScreenCanvas1.drawBitmap(sourceBitmap, sourceRect1, screenRect1, null);
-		offScreenCanvas1.drawBitmap(sourceBitmap, sourceRect2, screenRect2, null);
-
-		if (diry)
-			moveUp();
-		else
-			moveDown();
-		offScreenCanvas2.drawBitmap (offScreenBitmap1, sourceRect3, screenRect3, null);
-		offScreenCanvas2.drawBitmap (offScreenBitmap1, sourceRect4, screenRect4, null);
-		
-		draw (c);
+		draw(c);
 	}
 	
 	
@@ -253,7 +236,21 @@ public class Background implements AnimObject
 	@Override
 	public void draw(Canvas c) 
 	{
-		c.drawBitmap(offScreenBitmap2, 0, 0, null);
+		Canvas c1 = new Canvas (off1);
+		if (dirx)
+			moveRight();
+		else
+			moveLeft();
+		c1.drawBitmap(sourceBitmap, sourceRect1, screenRect1, null);
+		c1.drawBitmap(sourceBitmap, sourceRect2, screenRect2, null);
+
+		if (diry)
+			moveUp();
+		else
+			moveDown();
+		
+		c.drawBitmap (off1, sourceRect3, screenRect3, null);
+		c.drawBitmap (off1, sourceRect4, screenRect4, null);
 	}
 
 	/**

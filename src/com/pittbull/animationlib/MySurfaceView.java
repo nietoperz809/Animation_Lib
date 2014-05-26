@@ -58,7 +58,7 @@ public class MySurfaceView extends SurfaceView implements android.view.SurfaceHo
         Animation a;
         float scale = 0.5f;
         
-        background = new Background (R.raw.hubble);
+        background = new Background (R.raw.backgound_0800x1280_noise_a11);
         background.setSpeedVector(1, -5);
         
         chargen.setOrigin(10, 10);
@@ -118,10 +118,11 @@ public class MySurfaceView extends SurfaceView implements android.view.SurfaceHo
         store (c);
 
         thread = new Thread(this);
-        thread.setPriority(Thread.MAX_PRIORITY);
+        //thread.setPriority(Thread.MAX_PRIORITY);
         thread.start();
         
         mover = new Mover (animations2);
+        //mover.getThread().setPriority(Thread.MAX_PRIORITY);
 	}
 
 	@Override
@@ -148,11 +149,12 @@ public class MySurfaceView extends SurfaceView implements android.view.SurfaceHo
 	@Override
 	public void run() 
 	{
+		background.setSpeedVector(-10, 0);
 		while (running)
 		{
-			float pos[] = sens1.getValues();
-			if (pos != null)
-				background.setSpeedVector((int)pos[2]*10, (int)pos[1]*10);
+//			float pos[] = sens1.getValues();
+//			if (pos != null)
+//				background.setSpeedVector((int)pos[2]*10, (int)pos[1]*10);
 			
 			Canvas surface = getHolder().lockCanvas();
 			synchronized (surface)
@@ -162,7 +164,6 @@ public class MySurfaceView extends SurfaceView implements android.view.SurfaceHo
 				for (AnimObject item : animations)
 				{
 					item.drawAndUpdate(surface);
-					Thread.yield();
 				}
 				draw(surface);
 				getHolder().unlockCanvasAndPost(surface);

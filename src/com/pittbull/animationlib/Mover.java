@@ -15,11 +15,15 @@ public class Mover implements Runnable
 	private Thread thread;
 	Point displaysize = MySurfaceView.getScreenSize();
 	
+	public Thread getThread()
+	{
+		return thread;
+	}
+	
 	public Mover (ArrayList<Animation> al)
 	{
 		animations = al;
 		thread = new Thread(this);
-		thread.setPriority(Thread.MAX_PRIORITY);
 		thread.start();
 	}
 	
@@ -55,6 +59,7 @@ public class Mover implements Runnable
 				an.getMoveVector().y= -an.getMoveVector().y;			
 			for (int n=0; n<animations.size(); n++)
 			{
+				Thread.yield();
 				Animation a2 = animations.get(n);
 				if (a2 == an)
 					continue;
@@ -82,14 +87,14 @@ public class Mover implements Runnable
 		while (running)
 		{
 			perform();
-			try 
-			{
-				Thread.sleep (5);
-			} 
-			catch (InterruptedException e) 
-			{
-				e.printStackTrace();
-			}
+//			try 
+//			{
+//				Thread.sleep (5);
+//			} 
+//			catch (InterruptedException e) 
+//			{
+//				e.printStackTrace();
+//			}
 		}
 	}
 
