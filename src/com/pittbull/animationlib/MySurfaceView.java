@@ -24,8 +24,9 @@ public class MySurfaceView extends SurfaceView implements android.view.SurfaceHo
 	private Thread thread;
 	private Mover mover;
 	private Background background;
-	private OrientationSensor sens1 = new OrientationSensor();
+	//private OrientationSensor sens1 = new OrientationSensor();
 	private C64Chargen chargen = new C64Chargen();
+	private TouchEvents touch = new TouchEvents (this, 20);
 	
 	public MySurfaceView(Context context, AttributeSet attributeSet) 
 	{
@@ -149,12 +150,12 @@ public class MySurfaceView extends SurfaceView implements android.view.SurfaceHo
 	@Override
 	public void run() 
 	{
-		background.setSpeedVector(-10, 0);
 		while (running)
 		{
-//			float pos[] = sens1.getValues();
-//			if (pos != null)
-//				background.setSpeedVector((int)pos[2]*10, (int)pos[1]*10);
+			Point pt = touch.get();
+			if (pt != null)
+				background.setSpeedVector(pt.x, pt.y);
+			
 			
 			Canvas surface = getHolder().lockCanvas();
 			synchronized (surface)
