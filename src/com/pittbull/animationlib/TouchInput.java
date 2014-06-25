@@ -18,43 +18,27 @@ import android.widget.Toast;
 public class TouchInput implements OnTouchListener 
 {
 	private Point currentPoint = new Point(); 
-	private Point accumulatedPoint = new Point(); 
-	private int divisor = 1; 
-	private final CircularFifoQueue<Point> ringBuffer = new CircularFifoQueue<Point>(4);
+	private final CircularFifoQueue<Point> ringBuffer = new CircularFifoQueue<Point>(10);
 	
 	public TouchInput (View v)
 	{
 		v.setOnTouchListener(this);
 	}
 
-	public TouchInput (View v, int d)
-	{
-		this(v);
-		setDivisor(d);
-	}
-	
 	public Point get()
 	{
-		return ringBuffer.poll();
-	}
-	
-	public Point getAccumulated()
-	{
-		Point p = get();
-		if (p == null)
+		try
+		{
+			return ringBuffer.poll();
+		}
+		catch (Exception ex)
+		{
 			return null;
-		accumulatedPoint.x += p.x;
-		accumulatedPoint.y += p.y;
-		return new Point (accumulatedPoint);
+		}
 	}
 	
-	public void setDivisor (int d)
-	{
-		if (d == 0)
-			divisor = 1;
-		else
-			divisor = d;
-	}
+	Point startPoint = new Point();
+	Point endPoint = new Point();
 	
 	@Override
 	public boolean onTouch(View v, MotionEvent event) 
@@ -64,15 +48,21 @@ public class TouchInput implements OnTouchListener
 	    switch (act)
 	    {
 	    	case MotionEvent.ACTION_DOWN:
-	    	currentPoint.x = (int)event.getX();
-	    	currentPoint.y = (int)event.getY();
+	    	startPoint.x = (int) event.getRawX();
+	    	startPoint.y = (int) event.getRawY();
+	    	break;
+
+	    	case MotionEvent.ACTION_UP:
+	    	endPoint.x = (int)event.getRawX();
+	    	endPoint.y = (int)event.getRawY();
 	    	break;
 	    	
-	    	case MotionEvent.ACTION_UP:
-		    currentPoint.x = ((int)event.getX() - currentPoint.x)/divisor;
-		    currentPoint.y = - ((int)event.getY() - currentPoint.y)/divisor;
+	    	case MotionEvent.ACTION_MOVE:
+		    currentPoint.x = -(int)event.getRawX() + startPoint.x;
+		    currentPoint.y = -(int)event.getRawY() + startPoint.y;
+	    	startPoint.x = (int) event.getRawX();
+	    	startPoint.y = (int) event.getRawY();
 			ringBuffer.add(currentPoint);
-		    //Toast.makeText(MyApp.get(), "X: "+pt.x+" Y: "+pt.y, Toast.LENGTH_SHORT).show();
 			currentPoint = new Point();
 	    	break;
 	    }

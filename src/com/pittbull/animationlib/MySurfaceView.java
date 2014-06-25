@@ -26,7 +26,7 @@ public class MySurfaceView extends SurfaceView implements android.view.SurfaceHo
 	private BigImage bigimage;
 	//private OrientationSensor sens1 = new OrientationSensor();
 	private C64Chargen chargen = new C64Chargen();
-	private TouchInput touch = new TouchInput (this, 20);
+	private TouchInput touch = new TouchInput (this);
 	
 	public MySurfaceView(Context context, AttributeSet attributeSet) 
 	{
@@ -50,7 +50,7 @@ public class MySurfaceView extends SurfaceView implements android.view.SurfaceHo
         Animation a;
         float scale = 0.5f;
         
-        bigimage = new BigImage ("storage/sdcard0/DCIM/hubble/hubblestar", 32, 32);
+        bigimage = new BigImage ("storage/sdcard0/DCIM/hubble/hubblestar", 256, 256);
         
         chargen.setOrigin(10, 10);
         chargen.printLine ("Hello World");
@@ -142,11 +142,10 @@ public class MySurfaceView extends SurfaceView implements android.view.SurfaceHo
 	{
 		while (running)
 		{
-//			Point pt = touch.getAccumulated();
-//			if (pt != null)
-//				background.setSpeedVector(pt.x, pt.y);
-			
-			
+			Point pt = touch.get();
+			if (pt != null)
+				bigimage.setOffset(pt.x, pt.y);
+
 			Canvas surface = getHolder().lockCanvas();
 			synchronized (surface)
 			{
