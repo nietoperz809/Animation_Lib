@@ -23,10 +23,10 @@ public class MySurfaceView extends SurfaceView implements android.view.SurfaceHo
 	boolean running = true;
 	private Thread thread;
 	private Mover mover;
-	private Background background;
+	private BigImage bigimage;
 	//private OrientationSensor sens1 = new OrientationSensor();
 	private C64Chargen chargen = new C64Chargen();
-	private TouchEvents touch = new TouchEvents (this, 20);
+	private TouchInput touch = new TouchInput (this, 20);
 	
 	public MySurfaceView(Context context, AttributeSet attributeSet) 
 	{
@@ -44,23 +44,13 @@ public class MySurfaceView extends SurfaceView implements android.view.SurfaceHo
 			animations2.add((Animation)a);
 	}
 	
-	static Point getScreenSize()
-	{
-		WindowManager wm = (WindowManager)MyApp.get().getSystemService(Context.WINDOW_SERVICE);
-		Display d = wm.getDefaultDisplay();
-		Point size = new Point();
-		d.getSize(size);
-		return size;
-	}
-	
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) 
 	{
         Animation a;
         float scale = 0.5f;
         
-        background = new Background (R.raw.backgound_0800x1280_noise_a11);
-        background.setSpeedVector(1, -5);
+        bigimage = new BigImage ("storage/sdcard0/DCIM/hubble/hubblestar", 32, 32);
         
         chargen.setOrigin(10, 10);
         chargen.printLine ("Hello World");
@@ -152,15 +142,15 @@ public class MySurfaceView extends SurfaceView implements android.view.SurfaceHo
 	{
 		while (running)
 		{
-			Point pt = touch.get();
-			if (pt != null)
-				background.setSpeedVector(pt.x, pt.y);
+//			Point pt = touch.getAccumulated();
+//			if (pt != null)
+//				background.setSpeedVector(pt.x, pt.y);
 			
 			
 			Canvas surface = getHolder().lockCanvas();
 			synchronized (surface)
 			{
-				background.drawAndUpdate (surface);
+				bigimage.drawAndUpdate (surface);
 				chargen.draw (surface);
 				for (AnimObject item : animations)
 				{

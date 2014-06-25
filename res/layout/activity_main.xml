@@ -6,6 +6,7 @@
 
 <com.pittbull.animationlib.MySurfaceView
     android:layout_width="fill_parent"
+	android:focusable="true" 
+	android:clickable="true" 
     android:layout_height="fill_parent" />
-
 </RelativeLayout>

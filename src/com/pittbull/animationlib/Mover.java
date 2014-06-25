@@ -13,7 +13,7 @@ public class Mover implements Runnable
 	ArrayList<Animation> animations;
 	boolean running = true;
 	private Thread thread;
-	Point displaysize = MySurfaceView.getScreenSize();
+	Point displaysize = MyApp.getScreenSize();
 	
 	public Thread getThread()
 	{

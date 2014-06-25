@@ -15,18 +15,19 @@ import android.widget.Toast;
  * @author Administrator
  *
  */
-public class TouchEvents implements OnTouchListener 
+public class TouchInput implements OnTouchListener 
 {
-	private Point pt = new Point(); 
+	private Point currentPoint = new Point(); 
+	private Point accumulatedPoint = new Point(); 
 	private int divisor = 1; 
-	private final CircularFifoQueue<Point> buf = new CircularFifoQueue<Point>(4);
+	private final CircularFifoQueue<Point> ringBuffer = new CircularFifoQueue<Point>(4);
 	
-	public TouchEvents (View v)
+	public TouchInput (View v)
 	{
 		v.setOnTouchListener(this);
 	}
 
-	public TouchEvents (View v, int d)
+	public TouchInput (View v, int d)
 	{
 		this(v);
 		setDivisor(d);
@@ -34,7 +35,17 @@ public class TouchEvents implements OnTouchListener
 	
 	public Point get()
 	{
-		return buf.poll();
+		return ringBuffer.poll();
+	}
+	
+	public Point getAccumulated()
+	{
+		Point p = get();
+		if (p == null)
+			return null;
+		accumulatedPoint.x += p.x;
+		accumulatedPoint.y += p.y;
+		return new Point (accumulatedPoint);
 	}
 	
 	public void setDivisor (int d)
@@ -53,16 +64,16 @@ public class TouchEvents implements OnTouchListener
 	    switch (act)
 	    {
 	    	case MotionEvent.ACTION_DOWN:
-	    	pt.x = (int)event.getX();
-	    	pt.y = (int)event.getY();
+	    	currentPoint.x = (int)event.getX();
+	    	currentPoint.y = (int)event.getY();
 	    	break;
 	    	
 	    	case MotionEvent.ACTION_UP:
-		    pt.x = ((int)event.getX() - pt.x)/divisor;
-		    pt.y = - ((int)event.getY() - pt.y)/divisor;
-			buf.add(pt);
+		    currentPoint.x = ((int)event.getX() - currentPoint.x)/divisor;
+		    currentPoint.y = - ((int)event.getY() - currentPoint.y)/divisor;
+			ringBuffer.add(currentPoint);
 		    //Toast.makeText(MyApp.get(), "X: "+pt.x+" Y: "+pt.y, Toast.LENGTH_SHORT).show();
-			pt = new Point();
+			currentPoint = new Point();
 	    	break;
 	    }
 	    return false;

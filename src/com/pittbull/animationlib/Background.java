@@ -50,7 +50,7 @@ public class Background implements AnimObject
 	/**
 	 * Screeen dimensions
 	 */
-	private Point screenSize = MySurfaceView.getScreenSize();
+	static private Point screenSize = MyApp.getScreenSize();
 	/**
 	 * Rect objects for bitmap copies
 	 */

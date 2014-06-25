@@ -3,10 +3,13 @@ package com.pittbull.animationlib;
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.ReportField;
-
 import org.acra.annotation.ReportsCrashes;
 
 import android.app.Application;
+import android.content.Context;
+import android.graphics.Point;
+import android.view.Display;
+import android.view.WindowManager;
 
 @ReportsCrashes(formKey = "", // will not be used
 mailTo = "crashdump@yopmail.com",
@@ -29,6 +32,15 @@ public class MyApp extends Application
 	{
 		super.onCreate();
 	    ACRA.init(this);
+	}
+	
+	static Point getScreenSize()
+	{
+		WindowManager wm = (WindowManager)MyApp.get().getSystemService(Context.WINDOW_SERVICE);
+		Display d = wm.getDefaultDisplay();
+		Point size = new Point();
+		d.getSize(size);
+		return size;
 	}
 	
 	public void kill()
