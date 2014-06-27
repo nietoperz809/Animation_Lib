@@ -87,14 +87,6 @@ public class Mover implements Runnable
 		while (running)
 		{
 			perform();
-//			try 
-//			{
-//				Thread.sleep (5);
-//			} 
-//			catch (InterruptedException e) 
-//			{
-//				e.printStackTrace();
-//			}
 		}
 	}
 

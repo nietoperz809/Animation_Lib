@@ -1,12 +1,30 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="${packageName}.${activityClass}" >
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
 
 <com.pittbull.animationlib.MySurfaceView
+    android:id="@+id/surfaceView"
     android:layout_width="fill_parent"
-	android:focusable="true" 
-	android:clickable="true" 
-    android:layout_height="fill_parent" />
-</RelativeLayout>
+    android:layout_height="0dip"
+    android:layout_weight="50"
+   	android:focusable="true" 
+	android:clickable="true" /> 
+
+  <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:gravity="center_horizontal"
+        android:layout_gravity="bottom"
+        android:background="#00ff00">
+
+        <Button
+            android:id="@+id/buttonScreenShot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Make ScreenShot" />
+    </LinearLayout> 
+
+</LinearLayout>

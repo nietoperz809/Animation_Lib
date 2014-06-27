@@ -2,7 +2,6 @@ package com.pittbull.animationlib;
 
 import android.graphics.Canvas;
 import android.graphics.Point;
-import android.graphics.PointF;
 
 public class Counter implements AnimObject
 {
@@ -64,6 +63,10 @@ public class Counter implements AnimObject
 		
 		switch (dir)
 		{
+			case ALTERNATE:
+				// Not implemented
+				break;
+		
 			case FORWARD:
 				count_up();
 				break;

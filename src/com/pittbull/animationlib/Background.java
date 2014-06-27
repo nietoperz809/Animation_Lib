@@ -21,7 +21,7 @@ public class Background implements AnimObject
 	/**
 	 * Offscreen bitmap for horizontal movement
 	 */
-	private Bitmap offScreenBitmap1;
+	//private Bitmap offScreenBitmap1;
 	/**
 	 * Offscreen bitmap for vertical movement
 	 */

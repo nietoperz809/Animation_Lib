@@ -18,7 +18,7 @@ import android.widget.Toast;
 public class TouchInput implements OnTouchListener 
 {
 	private Point currentPoint = new Point(); 
-	private final CircularFifoQueue<Point> ringBuffer = new CircularFifoQueue<Point>(10);
+	private final CircularFifoQueue<Point> ringBuffer = new CircularFifoQueue<Point>(100);
 	
 	public TouchInput (View v)
 	{

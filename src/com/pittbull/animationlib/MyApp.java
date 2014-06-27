@@ -1,5 +1,7 @@
 package com.pittbull.animationlib;
 
+import java.io.FileOutputStream;
+
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.ReportField;
@@ -7,6 +9,8 @@ import org.acra.annotation.ReportsCrashes;
 
 import android.app.Application;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.view.Display;
 import android.view.WindowManager;
@@ -42,6 +46,42 @@ public class MyApp extends Application
 		d.getSize(size);
 		return size;
 	}
+	
+	public static boolean saveByteArray (String path, byte[] b)
+	{
+		try
+		{
+			FileOutputStream fos = new FileOutputStream(path);
+
+			fos.write(b);
+			fos.close();
+		} 
+		catch (java.io.IOException e)
+		{
+			return false;
+		}
+
+		return true;
+	}
+	
+	private static Bitmap makeTransparent (Bitmap in)
+	{
+		int width = in.getWidth();
+		int height = in.getHeight();
+		for(int x = 0; x < width; x++)
+		{
+		    for(int y = 0; y < height; y++)
+		    {
+		        if (in.getPixel(x, y) == Color.BLACK)
+		        {
+		            in.setPixel(x, y, Color.TRANSPARENT);
+		        }
+		    }
+		}	
+		return in;
+	}
+	
+
 	
 	public void kill()
 	{

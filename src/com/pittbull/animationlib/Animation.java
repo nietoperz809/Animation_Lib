@@ -31,7 +31,7 @@ public class Animation implements AnimObject
 	 * 
 	 */
 	private boolean pointer_direction;
-	private Point position = new Point (0, 0);
+	protected Point position = new Point (0, 0);
 	private AnimationDirection animation_direction = AnimationDirection.FORWARD;
 	private Point moveVector = new Point(0, 0);
 	
@@ -192,23 +192,6 @@ public class Animation implements AnimObject
 	      return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
 	}
 	
-	private static Bitmap makeTransparent (Bitmap in)
-	{
-		int width = in.getWidth();
-		int height = in.getHeight();
-		for(int x = 0; x < width; x++)
-		{
-		    for(int y = 0; y < height; y++)
-		    {
-		        if (in.getPixel(x, y) == Color.BLACK)
-		        {
-		            in.setPixel(x, y, Color.TRANSPARENT);
-		        }
-		    }
-		}	
-		return in;
-	}
-	
 	private void buildTiles (Bitmap source, float scale, int pieces)
 	{
 		float w = (float)source.getWidth() * scale;
@@ -267,7 +250,7 @@ public class Animation implements AnimObject
 	@Override
 	public void draw (Canvas c)
 	{
-		c.drawBitmap (bitmaps[(int)bitmapIndex], position.x, position.y, null);
+		c.drawBitmap (bitmaps[bitmapIndex], position.x, position.y, null);
 	}
 	
 	@Override
